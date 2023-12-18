@@ -92,6 +92,8 @@ def show_customer_interface():
     # 입력 필드
     name = st.text_input("이름")
     phone = st.text_input("전화번호")
+    booth_s = st.selectbox("부스 선택", booth_lst)
+
 
 
     # 제출 버튼
@@ -105,7 +107,7 @@ def show_customer_interface():
 
         # 대기 순서 가져오기
         cursor.execute(
-            "SELECT last_order_number FROM order_sequence WHERE booth =?", (booth_s,)
+            "SELECT last_order_number FROM order_sequence WHERE booth =?", (booth_s)
         )
         last_order_number = cursor.fetchone()[0]
         print(last_order_number)
