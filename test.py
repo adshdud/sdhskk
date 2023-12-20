@@ -81,20 +81,16 @@ def get_database_connection():
     return sqlite3.connect("sdhsf2.db")
 
 
-booth_number = 1 
-
 # 손님용 인터페이스
-def show_customer_interface(booth_number):
+def show_customer_interface():
     # Streamlit 페이지 설정
-    st.title(booth_lst[booth_number])
+    st.title("세심제2 부스 예약 시스템")
     st.header("예약하기")
 
     # 입력 필드
     name = st.text_input("이름")
     phone = st.text_input("전화번호")
-
-
-
+    booth_s = st.selectbox("부스 선택", booth_lst)
 
     # 제출 버튼
     submit = st.button("예약 제출")
@@ -105,23 +101,20 @@ def show_customer_interface(booth_number):
         conn = get_database_connection()
         cursor = conn.cursor()
 
-
-        booth_n = booth_lst[booth_number]
-        print(booth_n)
         # 대기 순서 가져오기
         cursor.execute(
-            "SELECT last_order_number FROM order_sequence WHERE booth =?", (booth_n,)
+            "SELECT last_order_number FROM order_sequence WHERE booth =?", (booth_s,)
         )
         last_order_number = cursor.fetchone()[0]
         print(last_order_number)
 
         # 예약 정보에 순서 추가
-        order_number = f"{booth_lst[booth_number]} {str(last_order_number + 1).zfill(2)}번"
+        order_number = f"{booth_s} {str(last_order_number + 1).zfill(2)}번"
 
         # 예약 정보 삽입
         cursor.execute(
             "INSERT INTO reservations (name, phone, booth, order_number) VALUES (?, ?, ?, ?)",
-            (name, phone, booth_lst[booth_number], order_number),
+            (name, phone, booth_s, order_number),
         )
 
         # 부스별 순서 업데이트
@@ -129,7 +122,7 @@ def show_customer_interface(booth_number):
         last_order_number += 1
         cursor.execute(
             "UPDATE order_sequence SET last_order_number = ? WHERE booth =?",
-            (last_order_number, booth_lst[booth_number]),
+            (last_order_number, booth_s),
         )
 
         # 변경사항 저장 및 연결 종료
@@ -149,7 +142,7 @@ def show_customer_interface(booth_number):
 
         receiver_lst = []
         receiver_lst.append(phone)
-        re_message = f"{booth_lst[booth_number]} 예약번호는 {last_order_number}입니다."
+        re_message = f"{booth_s} 예약번호는 {last_order_number}입니다."
         # re_message2 = f"준비완료 문자를 받은 후 5분이 지나면 예약은 초기화됩니다."
 
         t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
@@ -166,7 +159,7 @@ def get_reservations():
     send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
     st.title("부스 관리 시스템")
     st.header("예약 목록")
-
+    booth_s = st.selectbox("부스 선택", booth_lst)
 
 
     conn = get_database_connection()
@@ -176,7 +169,7 @@ def get_reservations():
     # 예약 목록 가져오기
     cursor.execute(
         "SELECT id, name, phone, booth, order_number FROM reservations WHERE booth=?",
-        (booth_lst[booth_number],),
+        (booth_s,),
     )
     reservations = cursor.fetchall()
 
@@ -216,91 +209,10 @@ def get_reservations():
 
 # 인터페이스 선택
 interface_option = st.sidebar.selectbox("인터페이스 선택", ["고객용 인터페이스", "부스 관리용 인터페이스"])
-interface_option1= st.sidebar.selectbox("부스선택", booth_lst)
+
 if interface_option == "고객용 인터페이스":
-    if interface_option1==  "2- 9반 : 육인이네 먹퀴즈":
-        booth_number = 0
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "2- 5반 : 경제: 투자의 귀재들":
-        booth_number = 1
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "1- 7반 : 사대부고 광기.(광고 기획)":
-        booth_number = 2
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "미술실 : 바다유리 업사이클링 작품 만들기":
-        booth_number = 3
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "수학학습실2 : 이 방송은 이제 제 겁니다.":
-        booth_number = 4
-        show_customer_interface(booth_number)
-    
-    if interface_option1==  "도서관 : 뇌주름 잡히는 방탈출":
-        booth_number = 5
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "구름다리 : 두 줄도 너무 길다(사진과 함께 쓰는 시 한편)":
-        booth_number = 6
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "2- 6반 : 음식 체험 미니 탕후루":
-        booth_number = 7
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "글로벌외국어실 : 영어 스피드 퀴즈":
-        booth_number = 8
-        show_customer_interface(booth_number)
-    
-    if interface_option1==  "아톰실 : 향기의 과학":
-        booth_number = 9
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "2- 7반 : 과학과 함께하는 놀이 체험":
-        booth_number = 10
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "2- 8반 : 피부 봉합 실습":
-        booth_number = 11
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "1- 9반 : 심리 테스트 카페(심리학, 뇌과학)":
-        booth_number = 12
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "바이오토피아실 : 친환경 손소독제 만들기":
-        booth_number = 13
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "국어학습실, 진로·진학활동실, 미래관 통로 : 두 번째 지구는 없다!":
-        booth_number = 14
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "코스모스실 : 당신의 쿠키를 선택하세요!★ 기관계 쿠키 만들기":
-        booth_number = 15
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "컴퓨터실 : 프로그래밍과 인공 지능 체험 학습":
-        booth_number = 16
-        show_customer_interface(booth_number)
-    
-    if interface_option1 ==  "사격장 : 체육(사격, 기록 도전! 마인드 컨트롤)":
-        booth_number = 17
-        show_customer_interface(booth_number)
-
-    if interface_option1==  "웅비관 : 체육(농구, 기록 도전! 자유투 및 3점슛)":
-        booth_number = 18
-        show_customer_interface(booth_number)
-
-    if interface_option1 ==  "학습도움반 : 바리스타 음료 서비":
-        booth_number = 19
-        show_customer_interface(booth_number)
-
-    if interface_option1 ==  "사회학습실 : 학술제 참가자 발표 영상_흡염 및 학교 폭력 예방 활동":
-        booth_number = 10
-        show_customer_interface(booth_number)
+    # 고객용 인터페이스 함수 호출
+    show_customer_interface()
 
 elif interface_option == "부스 관리용 인터페이스":
     get_reservations()
