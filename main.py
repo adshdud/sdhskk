@@ -92,12 +92,20 @@ def show_customer_interface(booth_number):
     # 입력 필드
     name = st.text_input("이름")
     phone = st.text_input("전화번호")
+       # if phone = f(reservation[2])
 
 
 
 
     # 제출 버튼
     submit = st.button("예약 제출")
+
+
+
+
+
+
+    
 
     # 제출 버튼이 눌렸을 때의 동작
     if submit:
@@ -194,7 +202,7 @@ def get_reservations(booth_number):
             )
         else:
             st.text(
-                f"ID: {reservation[0]}, 이름: {reservation[1]}, 전화번호: {reservation[2]}, 음식: {reservation[3]}, 순서: {reservation[4]}"
+                f"순서: {reservation[4]},  이름: {reservation[1]}, 전화번호: {reservation[2]}, 음식: {reservation[3]}, ID: {reservation[0]}"
             )
 
         # 예약 승인 버튼

@@ -6,7 +6,6 @@ from datetime import datetime
 conn = sqlite3.connect("sdhsf2.db")
 cursor = conn.cursor()
 
-
 # 예약 정보 테이블 생성
 cursor.execute(
     """
@@ -161,10 +160,8 @@ def get_reservations():
     st.header("예약 목록")
     booth_s = st.selectbox("부스 선택", booth_lst)
 
-
     conn = get_database_connection()
     cursor = conn.cursor()
-    
 
     # 예약 목록 가져오기
     cursor.execute(
@@ -190,9 +187,7 @@ def get_reservations():
             )
 
         # 예약 승인 버튼
-            
-        agree_b = st.checkbox(f"ID {reservation[0]} 예약 승인")            
-        if agree_b:
+        if st.button(f"ID {reservation[0]} 예약 승인"):
             send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
             receiver_lst = []
             receiver_lst.append(reservation[2])
@@ -200,8 +195,6 @@ def get_reservations():
             t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
             st.session_state[f"approved_{reservation[0]}"] = True
             st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]})이 승인되었습니다.")
-
-
 
     # 연결 종료
     conn.close()
@@ -216,3 +209,4 @@ if interface_option == "고객용 인터페이스":
 
 elif interface_option == "부스 관리용 인터페이스":
     get_reservations()
+
