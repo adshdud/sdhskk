@@ -162,7 +162,7 @@ def show_customer_interface(booth_number):
 # 부스 관리자용 인터페이스
 
 
-def get_reservations():
+def get_reservations(booth_number):
     send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
     st.title("부스 관리 시스템")
     st.header("예약 목록")
@@ -173,10 +173,11 @@ def get_reservations():
     cursor = conn.cursor()
     
 
+    booth_n=booth_lst[booth_number]
     # 예약 목록 가져오기
     cursor.execute(
         "SELECT id, name, phone, booth, order_number FROM reservations WHERE booth=?",
-        (booth_lst[booth_number],),
+        (booth_n,),
     )
     reservations = cursor.fetchall()
 
@@ -197,7 +198,6 @@ def get_reservations():
             )
 
         # 예약 승인 버튼
-            
         agree_b = st.checkbox(f"ID {reservation[0]} 예약 승인")            
         if agree_b:
             send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
@@ -207,6 +207,17 @@ def get_reservations():
             t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
             st.session_state[f"approved_{reservation[0]}"] = True
             st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]})이 승인되었습니다.")
+        
+        diagree_b = st.checkbox(f"ID {reservation[0]} 예약 취소")
+        if diagree_b:
+            send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
+            receiver_lst = []
+            receiver_lst.append(reservation[2])
+            re_message = f"{reservation[1]}님 {reservation[4]}이 마감되었습니다. 죄송합니다. "
+            t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
+            st.session_state[f"approved_{reservation[0]}"] = True
+            st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]})이 취소되었습니다.")
+            
 
 
 
@@ -299,8 +310,92 @@ if interface_option == "고객용 인터페이스":
         show_customer_interface(booth_number)
 
     if interface_option1 ==  "사회학습실 : 학술제 참가자 발표 영상_흡염 및 학교 폭력 예방 활동":
-        booth_number = 10
+        booth_number = 20
         show_customer_interface(booth_number)
 
 elif interface_option == "부스 관리용 인터페이스":
-    get_reservations()
+    if interface_option1==  "2- 9반 : 육인이네 먹퀴즈":
+        booth_number = 0
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "2- 5반 : 경제: 투자의 귀재들":
+        booth_number = 1
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "1- 7반 : 사대부고 광기.(광고 기획)":
+        booth_number = 2
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "미술실 : 바다유리 업사이클링 작품 만들기":
+        booth_number = 3
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "수학학습실2 : 이 방송은 이제 제 겁니다.":
+        booth_number = 4
+        get_reservations(booth_number)
+    
+    if interface_option1==  "도서관 : 뇌주름 잡히는 방탈출":
+        booth_number = 5
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "구름다리 : 두 줄도 너무 길다(사진과 함께 쓰는 시 한편)":
+        booth_number = 6
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "2- 6반 : 음식 체험 미니 탕후루":
+        booth_number = 7
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "글로벌외국어실 : 영어 스피드 퀴즈":
+        booth_number = 8
+        get_reservations(booth_number)
+    
+    if interface_option1==  "아톰실 : 향기의 과학":
+        booth_number = 9
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "2- 7반 : 과학과 함께하는 놀이 체험":
+        booth_number = 10
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "2- 8반 : 피부 봉합 실습":
+        booth_number = 11
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "1- 9반 : 심리 테스트 카페(심리학, 뇌과학)":
+        booth_number = 12
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "바이오토피아실 : 친환경 손소독제 만들기":
+        booth_number = 13
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "국어학습실, 진로·진학활동실, 미래관 통로 : 두 번째 지구는 없다!":
+        booth_number = 14
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "코스모스실 : 당신의 쿠키를 선택하세요!★ 기관계 쿠키 만들기":
+        booth_number = 15
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "컴퓨터실 : 프로그래밍과 인공 지능 체험 학습":
+        booth_number = 16
+        get_reservations(booth_number)
+    
+    if interface_option1 ==  "사격장 : 체육(사격, 기록 도전! 마인드 컨트롤)":
+        booth_number = 17
+        get_reservations(booth_number)
+
+    if interface_option1==  "웅비관 : 체육(농구, 기록 도전! 자유투 및 3점슛)":
+        booth_number = 18
+        get_reservations(booth_number)
+
+    if interface_option1 ==  "학습도움반 : 바리스타 음료 서비":
+        booth_number = 19
+        get_reservations(booth_number)
+
+    if interface_option1 ==  "사회학습실 : 학술제 참가자 발표 영상_흡염 및 학교 폭력 예방 활동":
+        booth_number = 20
+        get_reservations(booth_number)
+
+
