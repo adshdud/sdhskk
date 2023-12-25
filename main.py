@@ -94,77 +94,66 @@ def show_customer_interface(booth_number):
     phone = st.text_input("전화번호")
        # if phone = f(reservation[2])
 
-
-
-
     # 제출 버튼
     submit = st.button("예약 제출")
-
-
-
-
-
-
-    
 
     # 제출 버튼이 눌렸을 때의 동작
     if submit:
         # 데이터베이스 연결
         conn = get_database_connection()
         cursor = conn.cursor()
-
-
         booth_n = booth_lst[booth_number]
         print(booth_n)
-        # 대기 순서 가져오기
+
+
         cursor.execute(
-            "SELECT last_order_number FROM order_sequence WHERE booth =?", (booth_n,)
+            "SELECT COUNT(*) FROM reservations WHERE booth = ? AND phone = ?",
+            (booth_n, phone),
         )
-        last_order_number = cursor.fetchone()[0]
-        print(last_order_number)
+        existing_reservation_count = cursor.fetchone()[0]
 
-        # 예약 정보에 순서 추가
-        order_number = f"{booth_lst[booth_number]} {str(last_order_number + 1).zfill(2)}번"
+        if existing_reservation_count > 0:
+            st.warning("이미 해당 부스에 예약이 존재합니다. 중복 예약은 허용되지 않습니다.")
+        else:
+            # 대기 순서 가져오기
+            cursor.execute(
+                "SELECT last_order_number FROM order_sequence WHERE booth =?", (booth_n,)
+            )
+            last_order_number = cursor.fetchone()[0]
+            print(last_order_number)
 
-        # 예약 정보 삽입
-        cursor.execute(
-            "INSERT INTO reservations (name, phone, booth, order_number) VALUES (?, ?, ?, ?)",
-            (name, phone, booth_lst[booth_number], order_number),
-        )
+            # 예약 정보에 순서 추가
+            order_number = f"{booth_lst[booth_number]} {str(last_order_number + 1).zfill(2)}번"
 
-        # 부스별 순서 업데이트
+            # 예약 정보 삽입
+            cursor.execute(
+                "INSERT INTO reservations (name, phone, booth, order_number) VALUES (?, ?, ?, ?)",
+                (name, phone, booth_lst[booth_number], order_number),
+            )
 
-        last_order_number += 1
-        cursor.execute(
-            "UPDATE order_sequence SET last_order_number = ? WHERE booth =?",
-            (last_order_number, booth_lst[booth_number]),
-        )
+            # 부스별 순서 업데이트
 
-        # 변경사항 저장 및 연결 종료
-        conn.commit()
+            last_order_number += 1
+            cursor.execute(
+                "UPDATE order_sequence SET last_order_number = ? WHERE booth =?",
+                (last_order_number, booth_lst[booth_number]),
+            )
 
-        #    cursor.execute("SELECT * FROM order_sequence")
+            # 변경사항 저장 및 연결 종료
+            conn.commit()
+            conn.close()
 
-        # 조회된 모든 데이터를 출력
-        #    rows = cursor.fetchall()
-        #    for row in rows:
-        #        print(row)
+            # 예약 완료 메시지 표시
+            st.success(f"예약 완료! 순서는 {order_number} 입니다.")
+            receiver_lst = []
+            receiver_lst.append(phone)
+            re_message = f"{booth_lst[booth_number]} 예약번호는 {last_order_number}입니다."
+            # re_message2 = f"준비완료 문자를 받은 후 5분이 지나면 예약은 초기화됩니다."
 
-        conn.close()
+            t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
+            receiver_lst = []
+            print(t1)
 
-        # 예약 완료 메시지 표시
-        st.success(f"예약 완료! 순서는 {order_number} 입니다.")
-
-        receiver_lst = []
-        receiver_lst.append(phone)
-        re_message = f"{booth_lst[booth_number]} 예약번호는 {last_order_number}입니다."
-        # re_message2 = f"준비완료 문자를 받은 후 5분이 지나면 예약은 초기화됩니다."
-
-        t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
-        # t2 = sms.send_sms(receivers=receiver_lst, message=re_message2)
-        receiver_lst = []
-        print(t1)
-        # print(t2)
 
 
 # 부스 관리자용 인터페이스
@@ -206,7 +195,7 @@ def get_reservations(booth_number):
             )
 
         # 예약 승인 버튼
-        agree_b = st.checkbox(f"ID {reservation[0]} 예약 승인")            
+        agree_b = st.checkbox(f"{reservation[4]} 예약 승인")            
         if agree_b:
             send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
             receiver_lst = []
@@ -216,15 +205,15 @@ def get_reservations(booth_number):
             st.session_state[f"approved_{reservation[0]}"] = True
             st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]})이 승인되었습니다.")
         
-        diagree_b = st.checkbox(f"ID {reservation[0]} 예약 취소")
+        diagree_b = st.checkbox(f"{reservation[4]} 예약 취소")
         if diagree_b:
             send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
             receiver_lst = []
             receiver_lst.append(reservation[2])
-            re_message = f"{reservation[1]}님 {reservation[4]}이 마감되었습니다. 죄송합니다. "
+            re_message = f"{reservation[1]}님 {reservation[3]}이 마감되었습니다. 죄송합니다. "
             t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
             st.session_state[f"approved_{reservation[0]}"] = True
-            st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]})이 취소되었습니다.")
+            st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]}) 이(가) 취소되었습니다.")
             
 
 
