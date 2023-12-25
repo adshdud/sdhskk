@@ -88,6 +88,8 @@ def show_customer_interface(booth_number):
     # Streamlit 페이지 설정
     st.title(booth_lst[booth_number])
     st.header("예약하기")
+    st.divider()
+
 
     # 입력 필드
     name = st.text_input("이름")
@@ -96,6 +98,7 @@ def show_customer_interface(booth_number):
 
     # 제출 버튼
     submit = st.button("예약 제출")
+    st.divider()
 
     # 제출 버튼이 눌렸을 때의 동작
     if submit:
@@ -154,6 +157,12 @@ def show_customer_interface(booth_number):
             receiver_lst = []
             print(t1)
 
+    
+    st.divider()
+            
+
+    st.text('프로그램 관련 문의사항 01022619433')
+
 
 
 # 부스 관리자용 인터페이스
@@ -193,9 +202,9 @@ def get_reservations(booth_number):
             st.text(
                 f"순서: {reservation[4]},  이름: {reservation[1]}, 전화번호: {reservation[2]}, 음식: {reservation[3]}, ID: {reservation[0]}"
             )
-
+        
         # 예약 승인 버튼
-        agree_b = st.checkbox(f"{reservation[4]} 예약 승인")            
+        agree_b = st.checkbox(f"{reservation[4]} 예약 :blue[승인]")            
         if agree_b:
             send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
             receiver_lst = []
@@ -205,7 +214,7 @@ def get_reservations(booth_number):
             st.session_state[f"approved_{reservation[0]}"] = True
             st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]})이 승인되었습니다.")
         
-        diagree_b = st.checkbox(f"{reservation[4]} 예약 취소")
+        diagree_b = st.checkbox(f"{reservation[4]} 예약 :red[취소]")
         if diagree_b:
             send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
             receiver_lst = []
@@ -215,11 +224,16 @@ def get_reservations(booth_number):
             st.session_state[f"approved_{reservation[0]}"] = True
             st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]}) 이(가) 취소되었습니다.")
             
-
+        st.divider()
 
 
     # 연결 종료
     conn.close()
+
+
+
+#def passwodr():
+
 
 
 # 인터페이스 선택
