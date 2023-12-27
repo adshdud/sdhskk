@@ -85,6 +85,7 @@ booth_number = 1
 
 # 손님용 인터페이스
 def show_customer_interface(booth_number):
+    st.session_state.logink = 12
     # Streamlit 페이지 설정
     st.title(booth_lst[booth_number])
     st.header("예약하기")
@@ -232,7 +233,14 @@ def get_reservations(booth_number):
 # 관리자 인터페이스 비밀번호
 fixed_password = "1234"
 
-if 'logink' not in st
+if 'logink' not in st.session_state:
+    st.session_state.logink = 0
+    
+
+def login(password):
+    """로그인"""
+    return password == fixed_password
+
 # 로그인 페이지 구성
 def login_page():
     st.title("로그인")
@@ -243,14 +251,15 @@ def login_page():
         if login(password):
             st.success("로그인 성공")
             # 다음 화면으로 이동
-            st.experimental_rerun()
+            st.session_state.logink = 45
+            return True
         else:
-            st.error("잘못된 비밀번호")
-
+            st.error('잘못된 비밀번호')
+            
+            
+            
 # 메인 페이지 구성
 def main_page():
-    st.title("환영합니다!")
-    st.write("이곳에 로그인 후 보여질 내용을 입력하세요.")
     if interface_option1==  "2- 9반 : 육인이네 먹퀴즈":
         booth_number = 0
         get_reservations(booth_number)
@@ -430,6 +439,18 @@ if interface_option == "고객용 인터페이스":
         show_customer_interface(booth_number)
 
 elif interface_option == "부스 관리용 인터페이스":
-    login_page()
+    if st.session_state.logink == 45:
+        main_page()
+    elif login_page():
+        main_page()
+    
+    
+    
+    
+    
+    
+    
+    
+    #login_page()
 
 
