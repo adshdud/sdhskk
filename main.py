@@ -230,12 +230,9 @@ def get_reservations(booth_number):
 
 
 # 관리자 인터페이스 비밀번호
-fixed_password = 1234
+fixed_password = "1234"
 
-def login(password):
-    """사용자 로그인을 확인합니다."""
-    return password == fixed_password
-
+if 'logink' not in st
 # 로그인 페이지 구성
 def login_page():
     st.title("로그인")
