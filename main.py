@@ -29,6 +29,13 @@ CREATE TABLE IF NOT EXISTS order_sequence (
 """
 )
 
+
+
+
+
+
+
+
 booth_lst = [
     "2- 9반 : 육인이네 먹퀴즈",
     "2- 5반 : 경제: 투자의 귀재들",
@@ -165,14 +172,14 @@ def show_customer_interface(booth_number):
     st.text('프로그램 관련 문의사항 01022619433')
 
 
-
 # 부스 관리자용 인터페이스
 def get_reservations(booth_number):
+
     send_time = datetime.today().strftime("%Y/%m/%d %H:%M:%S")
     st.title("부스 관리 시스템")
     st.header("예약 목록")
 
-
+    sumlist = []
 
     conn = get_database_connection()
     cursor = conn.cursor()
@@ -184,6 +191,7 @@ def get_reservations(booth_number):
         "SELECT id, name, phone, booth, order_number FROM reservations WHERE booth=?",
         (booth_n,),
     )
+
     reservations = cursor.fetchall()
 
     for reservation in reservations:
@@ -222,12 +230,18 @@ def get_reservations(booth_number):
             t1 = sms.send_sms(receivers=receiver_lst, message=re_message)
             st.session_state[f"approved_{reservation[0]}"] = True
             st.success(f"{reservation[1]}님의 예약(ID: {reservation[0]}) 이(가) 취소되었습니다.")
-            
-        st.divider()
-
-
+        note = st.number_input('받은 금액', key =reservation[4],value=None)
+        sumlist.append(note)
+        st.divider()  
+        
+    price_sum = sum(sumlist)
+    st.write('수익',price_sum)   
+        
+        
+         
     # 연결 종료
     conn.close()
+
 
 
 # 관리자 인터페이스 비밀번호
